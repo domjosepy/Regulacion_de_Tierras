@@ -1,0 +1,164 @@
+/*! LOGIN CUSTOM FINAL */
+/* Fondo del login */
+body {
+    background: linear-gradient(135deg, #4e73df, #224abe);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Contenedor principal */
+.login-wrapper {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Caja del login */
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Título */
+.login-box h3 {
+    font-weight: 700;
+    color: #4e73df;
+    margin-bottom: 20px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #004085, #007bff);
+    color: white;
+    padding: 15px;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* Input Group */
+.form-group {
+    position: relative;
+    margin-bottom: 50px;
+    text-align: left;
+    
+}
+
+.form-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4e73df;
+}
+
+/* Inputs */
+.form-control {
+    padding-left: 40px;
+    height: 45px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 8px rgba(78, 115, 223, 0.5);
+}
+
+/* Botón login */
+.btn-login {
+    background: #4e73df;
+    color: white;
+    font-weight: bold;
+    transition: background 0.3s;
+    border-radius: 5px;
+}
+
+.btn-login:hover {
+    background: #224abe;
+}
+
+/* Botón custom extra */
+.btn-custom {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Enlaces olvidé contraseña y registrarse */
+.forgot-password {
+    display: block;
+    margin-top: 10px;
+    color: #4e73df;
+    font-size: 14px;
+    transition: color 0.3s;
+    text-decoration: underline;
+}
+
+.forgot-password:hover {
+    color: #224abe;
+    text-decoration: none;
+}
+
+/* Enlaces secundarios blancos */
+.enlace {
+    display: inline;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+    background: none;
+    color: #FFFFFF;
+    font-family: Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1em;
+}
+
+.enlace:hover {
+    text-decoration: none;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vibrar {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Clase de vibración */
+.vibrar {
+    animation: vibrar 1.5s ease-in-out;
+}
+
+/* Para login-page específico */
+#login-page .form-control {
+    padding-left: 40px;
+    height: 45px;
+}

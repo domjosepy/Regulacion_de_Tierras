@@ -1,0 +1,26 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordField = document.getElementById("password");
+
+    if (togglePassword && passwordField) {
+        togglePassword.addEventListener("click", function () {
+            const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+            passwordField.setAttribute("type", type);
+            this.classList.toggle("fa-eye");
+            this.classList.toggle("fa-eye-slash");
+        });
+    }
+
+    // Vibrar la caja si hay mensaje de error
+    const alert = document.querySelector(".alert-danger");
+    const loginBox = document.querySelector(".login-box");
+
+    if (alert && loginBox) {
+        loginBox.classList.add("vibrar");
+
+        // Sacar la clase de vibrar después de 1.5 segundos
+        setTimeout(() => {
+            loginBox.classList.remove("vibrar");
+        }, 1500);
+    }
+});

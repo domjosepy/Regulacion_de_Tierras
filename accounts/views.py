@@ -108,8 +108,8 @@ def edit_profile(request):
 
 @login_required
 def test_toast(request):
-    messages.success(request, "🎉 ¡Toast de prueba funciona correctamente!")
-    messages.warning(request, "⚠️ Este es un mensaje de advertencia.")
-    messages.error(request, "❌ Este es un mensaje de error.")
-    messages.info(request, "📢 Novedades disponibles")
+    messages.success(request, "¡Toast de prueba funciona correctamente!🎉")
+    messages.warning(request, "Este es un mensaje de advertencia. ⚠️")
+    messages.error(request, "Este es un mensaje de error. ❌")
+    messages.info(request, "Novedades disponibles 📢")
     return redirect("home")

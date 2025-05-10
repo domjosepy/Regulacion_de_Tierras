@@ -44,7 +44,7 @@ function createToast(message, type = 'info') {
                 <i class="fas ${icons[type] || icons.info} me-2"></i>
                 ${message}
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+            <button type="button" class="btn-close btn-close-white" 
                     data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     `;

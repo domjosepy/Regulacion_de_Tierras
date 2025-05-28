@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Regulación de Tierras</title>
+    {% load static %}
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Estilos personalizados -->
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+</head>
+
+<body class="login-container">
+    <!-- Contenedor de Toasts (herencia de base.html) -->
+    <div class="toast-container">
+        {% for message in messages %}
+        <div class="toast align-items-center text-white bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" 
+             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas 
+                        {% if message.tags == 'success' %}fa-check-circle
+                        {% elif message.tags == 'error' %}fa-exclamation-circle
+                        {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                        {% else %}fa-info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" 
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="login-wrapper">
+        <div class="header">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <div class="welcome-title">
+                <div class="align-items-center">Sistema de</div>
+                <div>Regulación de Tierras</div>
+            </div>
+        </div>
+
+        <div class="login-box">
+            <h3>Iniciar Sesión</h3>
+
+            <form method="post" action="{% url 'sistema:login' %}" class="user position-relative">
+                {% csrf_token %}
+                
+                <div class="form-group position-relative">
+                    <label for="username">Usuario</label>
+                    <i class="fas fa-user position-absolute" style="top: 71%; left: 15px; transform: translateY(-50%); color: #4e73df;"></i>
+                    <input type="text" name="username" id="username" class="form-control ps-5" required>
+                </div>
+
+                <div class="form-group position-relative">
+                    <label for="password">Contraseña</label>
+                    <i class="fas fa-lock position-absolute" style="top: 71%; left: 15px; transform: translateY(-50%); color: #4e73df;"></i>
+                    <input type="password" name="password" id="password" class="form-control ps-5" required>
+                    <i class="fas fa-eye toggle-password" id="togglePassword" style="position: absolute; right: 15px; top: 71%; transform: translateY(-50%); cursor: pointer; color: #4e73df;"></i>
+                </div>
+
+                <div class="form-group form-check text-start">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Recordar mi contraseña</label>
+                </div>
+
+                <button type="submit" class="btn btn-login btn-block mt-3">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="mt-3">
+                <a href="#" class="forgot-password" onclick="alert('Función no disponible aún');">¿Olvidaste tu contraseña?</a>
+                <a href="{% url 'sistema:signup' %}" class="forgot-password d-block mt-2">¿No tienes cuenta? Regístrate</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (consistentes con base.html) -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

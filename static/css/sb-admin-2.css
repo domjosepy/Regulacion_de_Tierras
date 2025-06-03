@@ -4074,6 +4074,26 @@ input[type="button"].btn-block {
   border-color: #eaecf4 #eaecf4 #dddfeb;
 }
 
+/* Efecto hover para pestañas */
+.nav-tabs .nav-link:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+/* Validación de campos */
+input:valid {
+    border-left: 4px solid #28a745 !important;
+}
+
+input:invalid:not(:placeholder-shown) {
+    border-left: 4px solid #dc3545 !important;
+}
+
+/* Badge para opcional */
+.badge-opcional {
+    font-size: 0.6em;
+    vertical-align: super;
+}
+
 .nav-tabs .nav-link.disabled {
   color: #858796;
   background-color: transparent;
@@ -5143,9 +5163,20 @@ a.badge-dark:focus, a.badge-dark.focus {
 }
 
 .alert-danger {
+  padding: 0.5rem;
+  margin-top: 0.2rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
   color: #78261f;
   background-color: #fadbd8;
   border-color: #f8ccc8;
+}
+.alert-danger small {
+    display: block;
+}
+.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
 .alert-danger hr {

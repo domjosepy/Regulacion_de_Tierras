@@ -87,28 +87,43 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
+# usamos nuestro modelo personalizado
+AUTH_USER_MODEL = 'sistema.User'  
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
+    # Validador de longitud mínima (¡el único activo!)
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 4,  # Contraseñas de 4+ caracteres.
+        }
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+
+    # ------------------------------------------------------------
+    # Validadores **deshabilitados** (comentados para desarrollo):
+    # ------------------------------------------------------------
+    
+    # 1. Evita que la contraseña sea similar a atributos del usuario (nombre, email, etc.)
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    
+    # 2. Evita contraseñas comunes (ej: "password123")
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    
+    # 3. Evita contraseñas 100% numéricas (ej: "123456")
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
 ]
 
 LOGIN_URL = "sistema:login"
-LOGIN_REDIRECT_URL = "sisrema:home"
+LOGIN_REDIRECT_URL = "sistema:home"
 LOGOUT_REDIRECT_URL = "sistema:login"
 
 # Internationalization

@@ -19,21 +19,49 @@
                         {% csrf_token %}
 
                         <div class="form-group">
-                            <label for="id_first_name"><i class="fas fa-user mr-2 text-primary"></i>Nombre</label>
+                            <label for="id_first_name"><i class="fas fa-user mr-2 text-primary"></i>Nombres:</label>
                             {{ form.first_name|add_class:"form-control" }}
                         </div>
 
                         <div class="form-group">
-                            <label for="id_last_name"><i class="fas fa-user-tag mr-2 text-primary"></i>Apellido</label>
+                            <label for="id_last_name"><i class="fas fa-user-tag mr-2 text-primary"></i>Apellidos:</label>
                             {{ form.last_name|add_class:"form-control" }}
                         </div>
 
                         <div class="form-group">
-                            <label for="id_email"><i class="fas fa-envelope mr-2 text-primary"></i>Email</label>
+                            <label for="id_ci"><i class="fas fa-id-badge mr-2 text-primary"></i>Cédula de Identidad:</label>
+                            {{ form.ci|add_class:"form-control" }}
+                            {% if form.ci.errors %}
+                                <div class="alert alert-danger mt-2">
+                                    {% for error in form.ci.errors %}
+                                        <small><i class="fas fa-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">{{ form.ci.help_text }}</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_telefono"><i class="fas fa-phone mr-2 text-primary"></i>Teléfono:</label>
+                            {{ form.telefono|add_class:"form-control" }}
+                            {% if form.telefono.errors %}
+                                <div class="alert alert-danger mt-2">
+                                    {% for error in form.telefono.errors %}
+                                        <small><i class="fas fa-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">{{ form.telefono.help_text }}</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_email"><i class="fas fa-envelope mr-2 text-primary"></i>Email:</label>
                             {{ form.email|add_class:"form-control" }}
                         </div>
+                       
                         <div class="text-center">
                             <button id="submit-btn" type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>
                                 <span id="btn-text">Guardar Cambios</span>
                                 <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                             </button>
@@ -46,4 +74,31 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+// Inicialización específica para esta página
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar dropdowns (solución alternativa segura)
+    $('.dropdown-toggle').dropdown();
+    
+    // Tu código específico de validación
+    const ciField = document.getElementById('id_ci');
+    if (ciField) {
+        ciField.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 8) this.value = this.value.slice(0, 8);
+        });
+    }
+
+    const telefonoField = document.getElementById('id_telefono');
+    if (telefonoField) {
+        telefonoField.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) this.value = this.value.slice(0, 10);
+        });
+    }
+});
+</script>
 {% endblock %}

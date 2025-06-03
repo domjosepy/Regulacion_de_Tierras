@@ -5,44 +5,137 @@
 {% block content %}
 <div class="container mt-5">
   <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-8">
       <div class="card shadow mb-4">
         <div class="card-header py-3 bg-success d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-white text-center">Crear Cuenta</h6>
-            <a href="{% url 'sistema:login' %}" class="btn btn-success" title="Ya tienes cuenta?">
-                <i class="fa-solid fa-person-walking"></i>
-                <i class="fa-solid fa-house"></i>
-            </a>
+          <h6 class="m-0 font-weight-bold text-white text-center">Crear Cuenta</h6>
+          <a href="{% url 'sistema:login' %}" class="btn btn-success" title="Ya tienes cuenta?">
+            <i class="fa-solid fa-person-walking"></i>
+            <i class="fa-solid fa-house"></i>
+          </a>
         </div>
         
         <div class="card-body">
           <form method="post">
             {% csrf_token %}
-
-            <div class="form-group">
-              <label for="id_username"><i class="fas fa-user mr-2 text-success"></i>Usuario</label>
-              {{ form.username|add_class:"form-control" }}
-            </div>
-
-            <div class="form-group">
-              <label for="id_password1"><i class="fas fa-lock mr-2 text-success"></i>Contraseña</label>
-              {{ form.password1|add_class:"form-control" }}
-            </div>
-
-            <div class="form-group">
-              <label for="id_password2"><i class="fas fa-lock mr-2 text-success"></i>Confirmar Contraseña</label>
-              {{ form.password2|add_class:"form-control" }}
-            </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-success ">
-                <span>Crear Cuenta</span>
+            
+            <!-- Pestañas -->
+            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" 
+                        data-bs-target="#personal" type="button" role="tab">
+                  Datos Personales (Op)
                 </button>
-            </div>  
-          
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link text-danger" id="account-tab" data-bs-toggle="tab" 
+                        data-bs-target="#account" type="button" role="tab">
+                  Cuenta *
+                </button>
+              </li>
+            </ul>
+            
+            <!-- Contenido de pestañas -->
+            <div class="tab-content" id="myTabContent">
+              <!-- Pestaña 1: Datos personales -->
+              <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id_first_name"><i class="fas fa-id-card mr-2 text-success"></i>Nombres:</label>
+                      {{ form.first_name|add_class:"form-control" }}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id_last_name"><i class="fas fa-id-card mr-2 text-success"></i>Apellidos:</label>
+                      {{ form.last_name|add_class:"form-control" }}
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row mt-3">
+                  <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="id_ci"><i class="fas fa-id-badge mr-2 text-success"></i><span class="position-relative">Cedula de Identidad:
+                          </span>
+                        </label>
+                        {{ form.ci|add_class:"form-control" }}
+                        {% if form.ci.help_text %}
+                          <small class="form-text text-muted">{{ form.ci.help_text }}</small>
+                        {% endif %}
+                      </div>
+                  </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="id_telefono"><i class="fas fa-phone mr-2 text-success"></i>Teléfono:</label>
+                        {{ form.telefono|add_class:"form-control" }}
+                      </div>
+                    </div>
+                  
+                </div>
+                <div class="text-end mt-3">
+                  <button type="button" class="btn btn-outline-success next-tab">
+                    Siguiente <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Pestaña 2: Datos de cuenta -->
+              <div class="tab-pane fade" id="account" role="tabpanel">
+                <div class="form-group">
+                  <label for="id_username"><i class="fas fa-user mr-2 text-success"></i>Usuario:</label>
+                  {{ form.username|add_class:"form-control" }}
+                  <small class="form-text text-muted">Requerido. 150 caracteres o menos.</small>
+                </div>
+
+                <div class="form-group mt-3">
+                  <label for="id_email"><i class="fas fa-envelope mr-2 text-success"></i>Email:</label>
+                  {{ form.email|add_class:"form-control" }}
+                </div>
+
+                <div class="form-group mt-3">
+                  <label for="id_password1"><i class="fas fa-lock mr-2 text-success"></i>Contraseña:</label>
+                  {{ form.password1|add_class:"form-control" }}
+                  <small class="form-text text-muted">
+                    Mínimo 8 caracteres, no solo números.
+                  </small>
+                </div>
+
+                <div class="form-group mt-3">
+                  <label for="id_password2"><i class="fas fa-lock mr-2 text-success"></i>Confirmar Contraseña</label>
+                  {{ form.password2|add_class:"form-control" }}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary prev-tab">
+                    <i class="fas fa-arrow-left"></i> Anterior
+                  </button>
+                  <button type="submit" class="btn btn-success">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    <span>Crear Cuenta</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+// Navegación entre pestañas
+document.querySelector('.next-tab').addEventListener('click', function() {
+  const accountTab = new bootstrap.Tab(document.getElementById('account-tab'));
+  accountTab.show();
+});
+
+document.querySelector('.prev-tab').addEventListener('click', function() {
+  const personalTab = new bootstrap.Tab(document.getElementById('personal-tab'));
+  personalTab.show();
+});
+</script>
+
 {% endblock %}

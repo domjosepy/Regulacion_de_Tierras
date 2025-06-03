@@ -1,0 +1,98 @@
+<!-- sistema/templates/sistema/gestion_usuarios.html -->
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Gestión de Usuarios</h1>
+    
+    <!-- Usuarios Pendientes -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Usuarios Pendientes de Asignación</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios_pendientes %}
+                        <tr>
+                            <td>{{ usuario.username }}</td>
+                            <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
+                            <td>
+                                <a href="{% url 'asignar_rol' usuario.id %}" class="btn btn-sm btn-primary">
+                                    Asignar Rol
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No hay usuarios pendientes</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Usuarios Activos -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Usuarios con Rol Asignado</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Nombre</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios_activos %}
+                        <tr>
+                            <td>{{ usuario.username }}</td>
+                            <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+                            <td>{{ usuario.get_rol_display }}</td>
+                            <td>
+                                {% if usuario.is_active %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'asignar_rol' usuario.id %}" class="btn btn-sm btn-info">
+                                    Editar Rol
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No hay usuarios activos</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

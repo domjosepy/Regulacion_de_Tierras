@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+# =================================================
+# MODELO DE USUARIO PERSONALIZADO
+# =================================================
 class User(AbstractUser):
     # Heredamos de AbstractUser para extender el modelo User estándar
     ROLES = (
@@ -38,3 +41,20 @@ class User(AbstractUser):
         permissions = [
             ("asignar_roles", "Puede asignar roles a usuarios"),
         ]
+
+#=================================================
+# MODELO DE NOTIFICACIONES
+#=================================================
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha = models.DateTimeField(auto_now_add=True)
+    
+    @classmethod
+    def crear_nuevo_usuario(cls, usuario_nuevo):
+        admins = User.objects.filter(is_superuser=True)
+        mensaje = f"Nuevo usuario registrado: {usuario_nuevo.username} ({usuario_nuevo.date_joined.strftime('%d/%m/%Y %H:%M')})"
+        
+        for admin in admins:
+            Notificacion.objects.create(usuario=admin, mensaje=mensaje)

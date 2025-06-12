@@ -4,7 +4,9 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 
-
+# ==============================================
+# FORMULARIOS DE USUARIO
+# ==============================================
 class UserUpdateForm(forms.ModelForm):
     ci = forms.CharField(
         required=False,
@@ -50,7 +52,9 @@ class UserUpdateForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'placeholder': 'Apellido'}), 
         }
 
-
+# ==============================================
+# FORMULARIOS DE REGISTRO PERSONALIZADO (signup)
+# ==============================================
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
@@ -92,6 +96,61 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['telefono'].required = False
         self.fields['email'].required = False
 
+#======================================================
+# FORMULARIO DE CREACIÓN DE USUARIO PARA ADMINISTRADOR
+#======================================================
+class CrearUsuarioForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2', 'rol')
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Configuración de campos de contraseña
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
+        
+        # Configuración del campo rol
+        self.fields['rol'] = forms.ChoiceField(
+            choices=[(role, label) for role, label in User.ROLES if role != 'PENDIENTE'],
+            initial='GERENTE',
+            widget=forms.Select(attrs={'class': 'form-control'})
+        )
+        # Mensajes de ayuda más claros
+        self.fields['password1'].help_text = """
+        <ul class="text-muted small">
+            <li>Mínimo 8 caracteres</li>
+            <li>No puede ser similar a otros datos personales</li>
+            <li>No puede ser una contraseña común</li>
+            <li>No puede ser completamente numérica</li>
+        </ul>
+        """
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if password1 and password2 and password1 != password2:
+            self.add_error('password2', "Las contraseñas no coinciden")
+        
+        return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Aseguramos que la contraseña se establezca correctamente
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+    
+#======================================================
+# FORMULARIO PARA ASIGNAR ROLES A USUARIOS EXISTENTES
+#======================================================
 class AsignarRolForm(forms.ModelForm):
     class Meta:
         model = User

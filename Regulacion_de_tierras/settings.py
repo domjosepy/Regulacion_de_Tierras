@@ -50,9 +50,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'sistema.middleware.VerificacionRolMiddleware',
 ]
 
 ROOT_URLCONF = 'Regulacion_de_tierras.urls'
+
+SECURE_SSL_REDIRECT = False # Cambia a True en producción
 
 TEMPLATES = [
     {
@@ -123,8 +126,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LOGIN_URL = "sistema:login"
-LOGIN_REDIRECT_URL = "sistema:home"
-LOGOUT_REDIRECT_URL = "sistema:login"
+LOGIN_REDIRECT_URL = "sistema:redireccion_por_rol" # Redirige según el rol del usuario
+LOGOUT_REDIRECT_URL = "/"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

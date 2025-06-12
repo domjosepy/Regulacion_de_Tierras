@@ -1,17 +1,25 @@
-from django.contrib.auth import logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, PasswordChangeView
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+#from django.utils.decorators import method_decorator
+#from django_ratelimit.decorators import ratelimit
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, TemplateView
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from .forms import UserUpdateForm, CustomUserCreationForm, AsignarRolForm 
-from .models import User
+from django.views.generic import CreateView, TemplateView
+from datetime import timedelta
+from django.utils import timezone
+from django.contrib.auth.decorators import user_passes_test
+# App local
+from .forms import UserUpdateForm, CustomUserCreationForm, AsignarRolForm, UserCreationForm, CrearUsuarioForm
+from .models import User, Notificacion
 
-# Create your views here.
-
-# VISTA LOGIN
+# ==============================================
+# VISTA DE LOGIN PERSONALIZADA
+# ==============================================
+#@method_decorator(ratelimit(key='ip', rate='5/m'), name='dispatch')
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
     redirect_authenticated_user = True
@@ -21,97 +29,211 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(
-            self.request, f"¡Bienvenido, {form.get_user().username}! 🎉")
+        messages.success(self.request, f"¡Bienvenido, {form.get_user().username}! 🎉")
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('sistema:home')
+        # Elimina la redirección fija a 'home'
+        redirect_to = self.request.POST.get('next', self.request.GET.get('next', ''))
+        if redirect_to:
+            return redirect_to
+        return reverse_lazy('sistema:redireccion_por_rol')  # Redirige al sistema de roles
 
-# VISTA DEL HOME
-class HomeView(TemplateView):
+# ==============================================
+# REDIRECCIÓN POR ROL
+# ==============================================
+@login_required
+def redireccion_por_rol(request):
+    if request.user.is_superuser or request.user.rol == 'ADMIN':
+        return redirect('sistema:admin_dashboard')
+    elif request.user.rol == 'GERENTE':
+        return redirect('sistema:gerente_dashboard')
+    elif request.user.rol == 'MONITOREO':
+        return redirect('monitoreo_dashboard')
+    elif request.user.rol == 'ANALISIS':
+        return redirect('sistema:analisis_dashboard')
+    elif request.user.rol == 'EXPEDIENTES':
+        return redirect('sistema:expedientes_dashboard')
+    elif request.user.rol == 'RELEVAMIENTO':
+        return redirect('sistema:relevamiento_dashboard')
+    elif request.user.rol == 'SIG':
+        return redirect('sig_dashboard')
+    else:
+        # Usuarios pendientes o sin rol
+        return redirect('pendiente_aprobacion')
+# ==============================================
+# VISTA DE PENDIENTE DE APROBACIÓN
+# ==============================================
+@login_required    
+def pendiente_aprobacion(request):
+    return render(request, 'pendiente_aprobacion.html')
+    
+# ==============================================
+# VISTA DE HOME PROTEGIDA
+# ==============================================
+class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            messages.warning(
-                request, "Debes iniciar sesión para acceder a esta página. 🔐")
-            return redirect('sistema:login')
-        return super().dispatch(request, *args, **kwargs)
-
-# VISTA DE CREACION DE CUENTA
+# ==============================================
+# VISTA DE REGISTRO PERSONALIZADA
+# ==============================================
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy("sistema:login")
     template_name = "registration/signup.html"
 
     def form_valid(self, form):
-        messages.success(
-            self.request, "¡Registro exitoso! Por favor inicia sesión. ✅")
+        messages.success(self.request, "¡Registro exitoso! Por favor inicia sesión. ✅")
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(
-            self.request, "Error en el registro. Revisa los datos. ❌")
+        messages.error(self.request, "Error en el registro. Revisa los datos. ❌")
         return super().form_invalid(form)
+    
+# =================================
+# VISTA DE REGISTRO PERSONALIZADA 
+# =================================
+class RegistroForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.rol = 'PENDIENTE'
+        if commit:
+            user.save()
+        return user
 
-# CAMBIO DE CONTRASEÑA
+def registro(request):
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)          
+            Notificacion.crear_nuevo_usuario(user)
+            return redirect('sistema:home')
+    else:
+        form = RegistroForm()
+    
+    return render(request, 'administrador/registro.html', {'form': form})
+
+def is_admin(user):
+    return user.is_superuser or user.rol == 'ADMIN'
+
+@login_required
+@user_passes_test(is_admin)
+def crear_usuario(request):
+    if request.method == 'POST':
+        form = CrearUsuarioForm(request.POST)
+        if form.is_valid():
+            try:
+                user = form.save()
+                messages.success(request, f'Usuario {user.username} creado exitosamente')
+                return redirect('sistema:gestion_usuarios')
+            except Exception as e:
+                messages.error(request, f'Error al crear usuario: {str(e)}')
+        else:
+            messages.error(request, 'Por favor corrija los errores en el formulario')
+    else:
+        form = CrearUsuarioForm()
+    
+    return render(request, 'administrador/crear_usuario.html', {'form': form})
+
+# ==============================================
+# VISTA DE CAMBIO DE CONTRASEÑA PERSONALIZADA
+# ==============================================
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = "registration/password_change_form.html"
     success_url = reverse_lazy("sistema:home")
 
     def form_valid(self, form):
-        messages.success(
-            self.request, "Contraseña actualizada correctamente. 🔑")
+        messages.success(self.request, "Contraseña actualizada correctamente. 🔑")
         return super().form_valid(form)
 
-# VISTA DE LOGOUT
+# ==============================================
+# VISTA DE LOGOUT PERSONALIZADA
+# ==============================================
 def custom_logout(request):
     logout(request)
     messages.success(request, "Has cerrado sesión correctamente. 👋")
     return redirect('sistema:login')
 
-
-
-# ASIGNACION DE ROLES    
+# ==============================================
+# VISTA DE GESTIÓN DE USUARIOS
+# ==============================================
 @login_required
 @permission_required('sistema.asignar_roles', raise_exception=True)
 def gestion_usuarios(request):
-    # Usuarios con rol asignado
     usuarios_activos = User.objects.exclude(rol='PENDIENTE').order_by('-date_joined')
-    
-    # Usuarios pendientes
     usuarios_pendientes = User.objects.filter(rol='PENDIENTE').order_by('-date_joined')
-    
-    return render(request, 'sistema/gestion_usuarios.html', {
+
+    return render(request, 'administrador/gestion_usuarios.html', {
         'usuarios_activos': usuarios_activos,
         'usuarios_pendientes': usuarios_pendientes,
     })
 
+                                                                   # VISTA DE DASHBOARD ADMINISTRATIVO
+                                                            # ==============================================
+def is_admin(user):
+    return user.is_superuser or user.rol == 'ADMIN'
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    # Usuarios recientemente creados (últimos 7 días)
+    nuevos_usuarios = User.objects.filter(
+        date_joined__gte=timezone.now() - timedelta(days=7)
+    )
+
+    # Estadísticas
+    total_usuarios = User.objects.count()
+    usuarios_pendientes = User.objects.filter(rol='PENDIENTE').count()
+    
+    return render(request, 'administrador/admin_dashboard.html', {
+        'nuevos_usuarios': nuevos_usuarios,
+        'total_usuarios': total_usuarios,
+        'usuarios_pendientes': usuarios_pendientes,
+    })
+# ==============================================
+# ASIGNACIÓN DE ROLES
+# ==============================================
 @login_required
 @permission_required('sistema.asignar_roles', raise_exception=True)
 def asignar_rol(request, user_id):
-    usuario = User.objects.get(pk=user_id)
-    
-    if request.method == 'POST':
-        form = AsignarRolForm(request.POST, instance=usuario)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Rol asignado correctamente a {usuario.username}')
-            return redirect('gestion_usuarios')
-    else:
-        form = AsignarRolForm(instance=usuario)
-    
-    return render(request, 'sistema/asignar_rol.html', {
+    usuario = get_object_or_404(User, pk=user_id)
+    form = AsignarRolForm(request.POST or None, instance=usuario)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, f'Rol asignado correctamente a {usuario.username}')
+        return redirect('gestion_usuarios')
+
+    return render(request, 'administrador/asignar_rol.html', {
         'form': form,
         'usuario': usuario,
     })
 
-# CAMBIO DE DATOS PERSONALES
+
+                                                                    # VISTA DE DASHBOARD DE ANÁLISIS
+                                                            # ============================================== 
+@login_required
+@user_passes_test(lambda u: u.rol == 'ANALISIS', login_url='sistema:pendiente_aprobacion')
+def analisis_dashboard(request):
+    # Aquí puedes agregar la lógica específica para el dashboard de análisis
+    # Por ejemplo, estadísticas, gráficos, etc.
+    return render(request, 'analisis/analisis_dashboard.html')
+    
+
+
+# ==============================================
+# EDICIÓN DE PERFIL
+# ==============================================
 @login_required
 def edit_profile(request):
+    form = UserUpdateForm(request.POST or None, instance=request.user)
+
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -123,26 +245,24 @@ def edit_profile(request):
             messages.success(request, "Perfil actualizado correctamente. ✅")
             return redirect('edit_profile')
         else:
-            # Agregar mensajes de error específicos
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"Error en {form.fields[field].label}: {error}")
-            
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({
                     "success": False,
                     "message": "Errores en el formulario",
                     "errors": form.errors.get_json_data()
                 })
-    else:
-        form = UserUpdateForm(instance=request.user)
-    
+
     return render(request, "registration/edit_profile.html", {"form": form})
 
-
+# ==============================================
+# TESTEO DE TOASTS (SOLO PARA DESARROLLO)
+# ==============================================
 @login_required
 def test_toast(request):
-    messages.success(request, "¡Toast de prueba funciona correctamente!🎉")
+    messages.success(request, "¡Toast de prueba funciona correctamente! 🎉")
     messages.warning(request, "Este es un mensaje de advertencia. ⚠️")
     messages.error(request, "Este es un mensaje de error. ❌")
     messages.info(request, "Novedades disponibles 📢")

@@ -6,7 +6,9 @@
 {% block content %}
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">Gestión de Usuarios</h1>
-    
+    <a href="{% url 'sistema:admin_dashboard' %}" class="btn btn-secondary mb-3">
+        Ir al Dashboard de Administración
+    </a>
     <!-- Usuarios Pendientes -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
@@ -32,7 +34,7 @@
                             <td>{{ usuario.email }}</td>
                             <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
                             <td>
-                                <a href="{% url 'asignar_rol' usuario.id %}" class="btn btn-sm btn-primary">
+                                <a href="{% url 'sistema:asignar_rol' usuario.id %}" class="btn btn-sm btn-primary">
                                     Asignar Rol
                                 </a>
                             </td>
@@ -79,7 +81,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'asignar_rol' usuario.id %}" class="btn btn-sm btn-info">
+                                <a href="{% url 'sistema:asignar_rol' usuario.id %}" class="btn btn-sm btn-info">
                                     Editar Rol
                                 </a>
                             </td>

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Análisis de Datos{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Panel de Análisis de Datos</h1>
+    
+    <!-- Filtros de análisis -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros de Análisis</h6>
+        </div>
+        <div class="card-body">
+            <form method="get">
+                <div class="form-row">
+                    <div class="col-md-4 mb-3">
+                        <label for="fecha_inicio">Fecha Inicio</label>
+                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="fecha_fin">Fecha Fin</label>
+                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
+                    </div>
+                    <div class="col-md-4 mb-3 align-self-end">
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estadísticas principales -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Registros Analizados</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_registros }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Promedio de Valor</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ promedio_valor }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Agrega más tarjetas de estadísticas según tus datos -->
+    </div>
+
+    <!-- Gráficos de análisis -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Visualización de Datos</h6>
+        </div>
+        <div class="card-body">
+            <div>
+                <!-- Aquí puedes insertar un gráfico, por ejemplo usando Chart.js -->
+                <canvas id="graficoAnalisis"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de datos analizados -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Datos Analizados</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Valor</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dato in datos_analizados %}
+                        <tr>
+                            <td>{{ dato.id }}</td>
+                            <td>{{ dato.nombre }}</td>
+                            <td>{{ dato.valor }}</td>
+                            <td>{{ dato.fecha|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">No hay datos para mostrar</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ejemplo de script para gráfico (requiere Chart.js) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('graficoAnalisis').getContext('2d');
+    var grafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                label: 'Valores',
+                data: {{ valores|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.5)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

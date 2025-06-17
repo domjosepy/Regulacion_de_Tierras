@@ -1,0 +1,62 @@
+<!-- Nav Item - Dashboard -->
+<li class="nav-item text-center">
+    <a class="nav-link" href="{% url 'sistema:admin_dashboard' %}">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>INICIO</span>
+    </a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Heading -->
+<div class="sidebar-heading text-center">
+    Administración
+</div>
+<hr class="sidebar-divider">
+<!-- Nav Item - Usuarios -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsers" 
+       aria-expanded="true" aria-controls="collapseUsers">
+        <i class="fas fa-fw fa-users"></i>
+        <span>GESTION DE USUARIOS</span>
+    </a>
+    <div id="collapseUsers" class="collapse" aria-labelledby="headingUsers" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Gestión:</h6>
+            <a class="collapse-item" href="#">Gestionar Roles</a>
+            <a class="collapse-item" href="{% url 'sistema:crear_usuario' %}">Crear Usuario</a>
+        </div>
+    </div>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Heading -->
+<div class="sidebar-heading text-center">
+    Modulos
+</div>
+<hr class="sidebar-divider">
+<!-- Nav Item - Usuarios -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAnalisis" 
+       aria-expanded="true" aria-controls="collapseAnalisis">
+        <i class="fas fa-fw fa-chart-bar"></i>
+        <span>ANALISIS</span>
+    </a>
+    <div id="collapseAnalisis" class="collapse" aria-labelledby="headingAnalisis" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Gestión:</h6>
+            <a class="collapse-item" href="#">Colonias Asignadas</a>
+            <a class="collapse-item" href="#">Analizadas</a>
+        </div>
+    </div>
+</li>
+<!-- Nav Item - Configuración -->
+<li class="nav-item">
+    <a class="nav-link" href="#">
+        <i class="fas fa-fw fa-cog"></i>
+        <span>Configuración</span>
+    </a>
+</li>

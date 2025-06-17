@@ -3,29 +3,31 @@
 <head>
     {% load static %}
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}SISTEMA DE REGULACION DE TIERRAS{% endblock %}</title>
-    
+
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
+    <!-- Bootstrap 4.6 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
     <!-- Estilos personalizados -->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
-    
-    <!-- DataTables (opcional) -->
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
-    
-    <!-- Estilos para toasts -->
+    <link href="{% static 'css/estilos.css' %}" rel="stylesheet">
+
+    <!-- Estilos para Toasts -->
     <style>
         .toast-container {
-            position: fixed;
-            top: 20px;
+            position: fixed;    
+            top: 70px;
             right: 20px;
             z-index: 1100;
             width: 350px;
@@ -35,145 +37,97 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: none;
-            min-width: 300px; /* Ancho mínimo para el toast */
+            min-width: 300px;
         }
-        /* Contenedor flexible para el toast */
         .toast .d-flex {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Distribuye espacio entre texto y botón */
+            justify-content: space-between;
             width: 100%;
         }
-        /* Estilo para el cuerpo del toast */
         .toast-body {
-            flex-grow: 1; /* Ocupa todo el espacio disponible */
-            padding-right: 0.5rem; /* Evita que el texto toque el botón */
-            white-space: nowrap; /* Evita saltos de línea */
+            flex-grow: 1;
+            padding-right: 0.5rem;
+            white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* Muestra "..." si el texto es muy largo */
+            text-overflow: ellipsis;
         }
-         /* Botón de cerrar fijo */
         .toast .btn-close {
-            flex-shrink: 0; /* Evita que se encoja */
-            margin-left: auto; /* Lo empuja a la derecha */
+            flex-shrink: 0;
+            margin-left: auto;
         }
-
         .bg-error { background-color: #dc3545 !important; }
         .toast-body i { margin-right: 10px; }
-        
+
         @media (max-width: 576px) {
             .toast-container {
+                top: 60px;
                 width: calc(100% - 40px);
                 right: 20px;
                 left: 20px;
+                transform: none;    
+            }
+            .toast {
+                min-width: unset; 
+                width: 100%;
             }
         }
     </style>
 </head>
 
 <body id="page-top">
-    <header>
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand navbar-dark bg-gradient-primary topbar mb-2 static-top shadow">
-            <div class="container-fluid">
-                <!-- Título centrado en móvil, izquierda en escritorio -->
-                <div class="navbar-brand d-flex align-items-center">
-                    <h4 class="m-0 text-white">REGULACIÓN DE TIERRAS</h4>
-                </div>
-                
-                <!-- Contenedor del menú de usuario -->
-                <div class="d-flex align-items-center ms-auto">
-                    {% if user.is_authenticated %}
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center pe-0" href="#" id="userDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="d-none d-lg-inline fw-bold text-white me-2">{{ user.username }}</span>
-                                <img class="img-profile rounded-circle border border-2 border-white" 
-                                    src="{% static 'img/undraw_profile_2.svg' %}" 
-                                    alt="Perfil" width="40" height="40">
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-lg mt-2" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item d-flex align-items-center" href="{% url 'sistema:edit_profile' %}">
-                                    <i class="fas fa-user fa-sm fa-fw text-primary me-2"></i>Perfil</a></li>
-                                <li><a class="dropdown-item d-flex align-items-center" href="{% url 'sistema:password_change_form' %}">
-                                    <i class="fas fa-cogs fa-sm fa-fw text-primary me-2"></i>Cambio de contraseña</a></li>
-                                    
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="#" title="Probar Toast: NO TIENE FUNCION">
-                                        <i class="fas fa-bell fa-sm fa-fw text-primary me-2"></i>
-                                        <span>Probar Toast</span>
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{% url 'sistema:logout' %}" method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-danger">
-                                            <i class="fas fa-sign-out-alt fa-sm fa-fw text-danger me-2"></i>Cerrar Sesión
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    {% else %}
-                    <div class="d-flex">
-                        <a href="{% url 'sistema:login' %}" class="btn btn-outline-light btn-sm me-2">
-                            <i class="fas fa-sign-in-alt me-1"></i>Iniciar sesión
-                        </a>
-                        
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </nav>
-    </header>
+    <div id="wrapper">
+        {% include 'includes/sidebar.html' %}
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                {% include 'includes/navbar.html' %}
 
-    <!-- Contenedor de Toasts -->
-    <div class="toast-container">
-        {% for message in messages %}
-        <div class="toast align-items-center text-white bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" 
-             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas 
-                        {% if message.tags == 'success' %}fa-check-circle
-                        {% elif message.tags == 'error' %}fa-exclamation-circle
-                        {% elif message.tags == 'warning' %}fa-exclamation-triangle
-                        {% else %}fa-info-circle{% endif %} me-2"></i>
-                    {{ message }}
+                <div class="container-fluid">
+                    <!-- Toasts -->
+                    <div class="toast-container">
+                        {% for message in messages %}
+                        <div class="toast align-items-center text-white bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" 
+                             role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    <i class="fas 
+                                        {% if message.tags == 'success' %}fa-check-circle
+                                        {% elif message.tags == 'error' %}fa-exclamation-circle
+                                        {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                                        {% else %}fa-info-circle{% endif %} me-2"></i>
+                                    {{ message }}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Contenido principal -->
+                    <main class="fade-in">
+                        {% block content %}{% endblock %}
+                    </main>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" 
-                        data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
+
+            <footer class="sticky-footer bg-gradient-primary mt-4">
+                <div class="container my-auto">
+                    <div class="text-center text-white my-auto">
+                        <span>&copy; Sistema de Regulación de Tierras</span>
+                    </div>
+                </div>
+            </footer>
         </div>
-        {% endfor %}
     </div>
 
-    <main class="fade-in">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="sticky-footer bg-gradient-primary mt-4">
-        <div class="container my-auto">
-            <div class="text-center text-white my-auto">
-                <span>&copy; Sistema de Regulación de Tierras</span>
-            </div>
-        </div>
-    </footer>
-
-   <!-- Scripts base -  -->
+    <!-- Scripts correctamente ordenados -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-    
-    <!-- Scripts personalizados -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
     <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
     <script src="{% static 'js/script.js' %}"></script>
-    
-    <!-- Bloques adicionales -->
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

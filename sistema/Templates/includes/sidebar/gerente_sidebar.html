@@ -1,0 +1,71 @@
+<!-- Nav Item - Dashboard -->
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'manager_dashboard' %}">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Dashboard</span>
+    </a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Heading -->
+<div class="sidebar-heading">
+    Gestión Territorial
+</div>
+
+<!-- Nav Item - Colonias -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseColonies" 
+       aria-expanded="true" aria-controls="collapseColonies">
+        <i class="fas fa-fw fa-map-marked-alt"></i>
+        <span>Colonias</span>
+    </a>
+    <div id="collapseColonies" class="collapse" aria-labelledby="headingColonies" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Operaciones:</h6>
+            <a class="collapse-item" href="#">Listar Colonias</a>
+            <a class="collapse-item" href="#">Nueva Colonia</a>
+        </div>
+    </div>
+</li>
+
+<!-- Nav Item - Distritos -->
+<li class="nav-item">
+    <a class="nav-link" href="#">
+        <i class="fas fa-fw fa-map"></i>
+        <span>Distritos</span>
+    </a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Heading -->
+<div class="sidebar-heading">
+    Operaciones
+</div>
+
+<!-- Nav Item - Relevamientos -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSurveys" 
+       aria-expanded="true" aria-controls="collapseSurveys">
+        <i class="fas fa-fw fa-clipboard-list"></i>
+        <span>Relevamientos</span>
+    </a>
+    <div id="collapseSurveys" class="collapse" aria-labelledby="headingSurveys" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Gestionar:</h6>
+            <a class="collapse-item" href="#">Solicitudes</a>
+            <a class="collapse-item" href="#">Nueva Solicitud</a>
+        </div>
+    </div>
+</li>
+
+<!-- Nav Item - Análisis -->
+<li class="nav-item">
+    <a class="nav-link" href="#">
+        <i class="fas fa-fw fa-chart-bar"></i>
+        <span>Solicitudes Análisis</span>
+    </a>
+</li>

@@ -168,3 +168,90 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar dropdowns (solución universal)
     $('.dropdown-toggle').dropdown();
 });
+// =================================
+// Toggle del sidebar
+// =================================
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+    document.body.classList.toggle('sidebar-toggled');
+    document.querySelector('.sidebar').classList.toggle('toggled');
+    
+    if (document.querySelector('.sidebar').classList.contains('toggled')) {
+        document.querySelectorAll('.sidebar .collapse.show').forEach(function(collapseEl) {
+            collapseEl.classList.remove('show');
+        });
+    }
+});
+
+// =================================
+// Toggle del sidebar en móviles
+// =================================
+// Cerrar el sidebar solo cuando se hace clic en un enlace de navegación (no en los toggles de menú)
+document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        // Si el enlace tiene un submenú, no cerrar el sidebar
+        if (this.getAttribute('data-bs-toggle') === 'collapse') {
+            return;
+        }
+        // Si es móvil y no es un menú con subopciones, cerrar el sidebar
+        if (window.innerWidth < 768) {
+            document.body.classList.add('sidebar-toggled');
+            document.querySelector('.sidebar').classList.add('toggled');
+        }
+    });
+});
+
+// =================================
+// Manejo de DataTables
+    
+ $(document).ready(function() {
+            // Inicializar DataTables
+            $('#recentTable, #pendingTable, #activeTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+                },
+                "order": [[3, "desc"]],
+                "responsive": true
+            });
+            
+            // Configurar el modal de asignación de roles
+            $('#asignarRolModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var userId = button.data('userid');
+                var username = button.data('username');
+                var currentRole = button.data('currentrole') || '';
+                var isActive = button.data('isactive') === 'true' || button.data('isactive') === true;
+                
+                var modal = $(this);
+                modal.find('#user_id').val(userId);
+                modal.find('#username-display').text(username);
+                modal.find('#rol').val(currentRole);
+                modal.find('#is_active').prop('checked', isActive);
+            });
+            
+            // Manejar el envío del formulario de creación de usuario
+            $('#crearUsuarioForm').submit(function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var submitBtn = form.find('button[type="submit"]');
+                
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creando...');
+                
+                $.ajax({
+                    type: "POST",
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        if(response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message || 'Error al crear usuario');
+                            submitBtn.prop('disabled', false).html('<i class="fas fa-save"></i> Crear Usuario');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + (xhr.responseJSON?.message || 'Error en la solicitud'));
+                        submitBtn.prop('disabled', false).html('<i class="fas fa-save"></i> Crear Usuario');
+                    }
+                });
+            });
+        });

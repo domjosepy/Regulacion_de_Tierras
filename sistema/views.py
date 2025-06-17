@@ -164,56 +164,99 @@ def custom_logout(request):
 # ==============================================
 @login_required
 @permission_required('sistema.asignar_roles', raise_exception=True)
-def gestion_usuarios(request):
-    usuarios_activos = User.objects.exclude(rol='PENDIENTE').order_by('-date_joined')
-    usuarios_pendientes = User.objects.filter(rol='PENDIENTE').order_by('-date_joined')
+def asignar_rol(request, user_id):
+    usuario = get_object_or_404(User, pk=user_id)
+    
+    if request.method == 'POST':
+        form = AsignarRolForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Rol actualizado correctamente para {usuario.username}')
+            return redirect('sistema:gestion_usuarios')
+    else:
+        form = AsignarRolForm(instance=usuario)
+    
+    context = {
+        'form': form,
+        'usuario': usuario,
+        'current_rol': usuario.get_rol_display(),
+    }
+    
+    return render(request, 'administrador/asignar_rol.html', context)
 
-    return render(request, 'administrador/gestion_usuarios.html', {
-        'usuarios_activos': usuarios_activos,
-        'usuarios_pendientes': usuarios_pendientes,
-    })
-
-                                                                   # VISTA DE DASHBOARD ADMINISTRATIVO
-                                                            # ==============================================
+# ==============================================
+# VISTA DE DASHBOARD ADMINISTRATIVO
+# ==============================================
 def is_admin(user):
     return user.is_superuser or user.rol == 'ADMIN'
 
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    # Usuarios recientemente creados (últimos 7 días)
-    nuevos_usuarios = User.objects.filter(
-        date_joined__gte=timezone.now() - timedelta(days=7)
-    )
-
-    # Estadísticas
+    # Obtener estadísticas
     total_usuarios = User.objects.count()
-    usuarios_pendientes = User.objects.filter(rol='PENDIENTE').count()
+    usuarios_pendientes = User.objects.filter(rol='PENDIENTE')
+    usuarios_activos = User.objects.filter(is_active=True).exclude(rol='PENDIENTE')
+    nuevos_usuarios = User.objects.order_by('-date_joined')[:10]
+    ultima_actividad = User.objects.latest('last_login').last_login if User.objects.exists() else timezone.now()
     
-    return render(request, 'administrador/admin_dashboard.html', {
-        'nuevos_usuarios': nuevos_usuarios,
+    context = {
         'total_usuarios': total_usuarios,
         'usuarios_pendientes': usuarios_pendientes,
-    })
+        'usuarios_activos': usuarios_activos,
+        'nuevos_usuarios': nuevos_usuarios,
+        'ultima_actividad': ultima_actividad,
+    }
+    return render(request, 'administrador/admin_dashboard.html', context)
+
 # ==============================================
-# ASIGNACIÓN DE ROLES
+# VISTA DE CREACIÓN DE USUARIO PARA ADMINISTRADOR
 # ==============================================
 @login_required
-@permission_required('sistema.asignar_roles', raise_exception=True)
-def asignar_rol(request, user_id):
-    usuario = get_object_or_404(User, pk=user_id)
-    form = AsignarRolForm(request.POST or None, instance=usuario)
+@user_passes_test(is_admin)
+def crear_usuario(request):
+    if request.method == 'POST':
+        form = CrearUsuarioForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'Usuario {user.username} creado exitosamente')
+            return redirect('sistema:admin_dashboard')
+    else:
+        form = CrearUsuarioForm()
+    
+    return render(request, 'administrador/crear_usuario.html', {'form': form})
+# ==============================================
+# VISTA AJAX PARA ASIGNAR ROL Y ACTIVO
+# ==============================================
+def asignar_rol_ajax(request):
+    """
+    Vista AJAX para asignar rol y estado activo a un usuario.
+    """
+    if request.method == 'POST' and request.headers.get("x-requested-with") == "XMLHttpRequest":
+        try:
+            user_id = request.POST.get('user_id')
+            rol = request.POST.get('rol')
+            is_active = request.POST.get('is_active') == 'on'
 
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, f'Rol asignado correctamente a {usuario.username}')
-        return redirect('gestion_usuarios')
+            usuario = User.objects.get(pk=user_id)
+            usuario.rol = rol
+            usuario.is_active = is_active
+            usuario.save()
 
-    return render(request, 'administrador/asignar_rol.html', {
-        'form': form,
-        'usuario': usuario,
-    })
+            return JsonResponse({
+                'success': True,
+                'message': 'Rol actualizado correctamente'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=400)
 
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    }, status=405)
 
                                                                     # VISTA DE DASHBOARD DE ANÁLISIS
                                                             # ============================================== 

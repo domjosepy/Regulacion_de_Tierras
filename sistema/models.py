@@ -34,8 +34,21 @@ class User(AbstractUser):
             )])
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
-    def __str__(self):
-        return f"{self.username} ({self.get_rol_display()})"
+    def get_rol_display(self):
+        return dict(self.ROLES).get(self.rol, self.rol)
+
+    def get_rol_color(self):
+        colors = {
+            'ADMIN': 'primary',
+            'GERENTE': 'info',
+            'MONITOREO': 'info',
+            'ANALISIS': 'info',
+            'EXPEDIENTES': 'info',
+            'RELEVAMIENTO': 'info',
+            'SIG': 'info',
+            'PENDIENTE': 'light',
+        }
+        return colors.get(self.rol, 'secondary')
 
     class Meta:
         permissions = [

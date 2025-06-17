@@ -1,0 +1,88 @@
+<div class="modal fade" id="asignarRolModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Asignar Rol a <span id="modalUsername"></span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="rolForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" id="user_id">
+                    
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <select class="form-control" name="rol" required>
+                            {% for value, label in usuario.ROLES %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="user_active" name="is_active">
+                        <label class="form-check-label" for="user_active">Usuario activo</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveRolBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Configurar el modal cuando se muestra
+    $('#asignarRolModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var userId = button.data('userid');
+        var username = button.data('username');
+        var currentRole = button.data('currentrole');
+        var isActive = button.data('isactive');
+        
+        $('#user_id').val(userId);
+        $('#modalUsername').val(username);
+        
+        if(currentRole) {
+            $('#rol').val(currentRole);
+        }
+        
+        $('#is_active').prop('checked', isActive === 'true' || isActive === true);
+    });
+    
+    // Manejar el guardado del formulario
+    $('#saveRolBtn').click(function() {
+        var form = $('#rolForm');
+        var formData = form.serialize();
+        var url = "{% url 'sistema:asignar_rol_ajax' %}";
+        
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            beforeSend: function() {
+                $('#saveRolBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            },
+            success: function(response) {
+                if(response.success) {
+                    // Recargar la página para ver los cambios
+                    location.reload();
+                } else {
+                    // Mostrar mensaje de error
+                    alert('Error: ' + (response.message || 'No se pudo completar la operación'));
+                    $('#saveRolBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Guardar Cambios');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error en la solicitud: ' + error);
+                $('#saveRolBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Guardar Cambios');
+            }
+        });
+    });
+});
+</script>

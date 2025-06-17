@@ -27,10 +27,12 @@ urlpatterns = [
     # 3. Panel de Administración y Gestión de Usuarios
     # --------------------------------------------
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('usuarios/', views.gestion_usuarios, name='gestion_usuarios'),
+    #path('usuarios/', views.gestion_usuarios, name='gestion_usuarios'),
     path('usuarios/asignar_rol/<int:user_id>/', views.asignar_rol, name='asignar_rol'),
     path('registro/', views.registro, name='registro'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
+    path('asignar-rol/ajax/', views.asignar_rol_ajax, name='asignar_rol_ajax'),
+    
     # --------------------------------------------
     # 4. Paneles Específicos por Rol
     # --------------------------------------------

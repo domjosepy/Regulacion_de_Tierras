@@ -155,11 +155,21 @@ class AsignarRolForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['rol', 'is_active']
-        labels = {
-            'is_active': 'Activar usuario',
+        widgets = {
+            'rol': forms.Select(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Filtramos los roles que no son "PENDIENTE"
-        self.fields['rol'].choices = [choice for choice in User.ROLES if choice[0] != 'PENDIENTE']
+        # Filtra roles no deseados
+        self.fields['rol'].choices = [
+            (role, label) for role, label in User.ROLES 
+            if role != 'PENDIENTE'
+        ]
+        
+    def clean_rol(self):
+        rol = self.cleaned_data.get('rol')
+        if rol == 'PENDIENTE':
+            raise forms.ValidationError("No se puede asignar el rol 'Pendiente'")
+        return rol

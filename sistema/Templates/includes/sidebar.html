@@ -1,0 +1,38 @@
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'sistema:home' %}">
+        <div class="sidebar-brand-icon">
+            <i class="fas fa-map-marked-alt"></i>
+        </div>
+        <div class="sidebar-brand-text mx-2">SRT</div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    {% if user.is_authenticated %}
+        {% with 'includes/sidebar/'|add:user.rol|lower|add:'_sidebar.html' as sidebar_template %}
+            {% include sidebar_template %}
+        {% endwith %}
+    {% else %}
+        {% include 'includes/sidebar/base_sidebar.html' %}
+    {% endif %}
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebarToggle = document.getElementById('sidebarToggle');
+            var sidebar = document.getElementById('accordionSidebar');
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('toggled');
+                });
+            }
+        });
+    </script>
+</ul>
